@@ -1,5 +1,4 @@
-import {Schema, model} from "mongoose";
-
+import { Schema, model } from "mongoose";
 
 const userSchema = new Schema(
 	{
@@ -21,12 +20,13 @@ const userSchema = new Schema(
 		},
 		user_type: {
 			type: String,
+			required: true,
 			enum: ["vendor", "customer"],
 		},
 	},
 	{ timestamps: true }
 );
 
-const User = model('User', userSchema)
+const User = model("User", userSchema);
 
 export default User;
