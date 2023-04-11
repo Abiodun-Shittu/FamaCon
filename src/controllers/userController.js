@@ -1,4 +1,9 @@
 import User from "../model/userModel.js";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+dotenv.config();
+
+const salt = Number(process.env.HASH_SALT);
 
 // Create a new User
 export const createUser = async (req, res) => {
@@ -8,10 +13,12 @@ export const createUser = async (req, res) => {
 		if (checkEmailExists) {
 			return res.status(404).json({ message: "Email already exists" });
 		}
+		// hash the password
+		const passwordHash = await bcrypt.hash(password, salt);
 		const newUser = await User.create({
 			name,
 			email,
-			password,
+			password: passwordHash,
 			profile_picture,
 			user_type,
 		});
@@ -20,10 +27,8 @@ export const createUser = async (req, res) => {
 			.json({ message: "User created successfully", data: newUser });
 	} catch (error) {
 		console.log(error);
-		return res
-			.status(500)
-			.json({
-				message: "System Error, please contact the administrator",
-			});
+		return res.status(500).json({
+			message: "System Error, please contact the administrator",
+		});
 	}
 };
