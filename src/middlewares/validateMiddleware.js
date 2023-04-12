@@ -1,3 +1,5 @@
+import { InvalidBodyParamsException } from "../exceptions/invalidBodyParamsException.js";
+
 export const validateRequiredParams = (requiredParams = []) => {
 	return (req, res, next) => {
 		let message = "";
@@ -10,7 +12,7 @@ export const validateRequiredParams = (requiredParams = []) => {
 			}
 		});
 		if (Object.keys(errors).length > 0) {
-			return res.status(422).json({ message, errors });
+			throw new InvalidBodyParamsException(message, errors);
 		}
 
 		next();

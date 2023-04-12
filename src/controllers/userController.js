@@ -1,17 +1,18 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import { ConflictException } from "../exceptions/conflictException.js";
 dotenv.config();
 
 const salt = Number(process.env.HASH_SALT);
 
 // Create a new User
-export const createUser = async (req, res) => {
+export const createUser = async (req, res, next) => {
 	try {
 		const { name, email, password, profile_picture, user_type } = req.body;
 		const checkEmailExists = await User.findOne({ email });
 		if (checkEmailExists) {
-			return res.status(404).json({ message: "Email already exists" });
+			throw new ConflictException("Email already exists");
 		}
 		// hash the password
 		const passwordHash = await bcrypt.hash(password, salt);
@@ -27,8 +28,6 @@ export const createUser = async (req, res) => {
 			.json({ message: "User created successfully", data: newUser });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({
-			message: "System Error, please contact the administrator",
-		});
+		next(error);
 	}
 };
