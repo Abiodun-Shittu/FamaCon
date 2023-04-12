@@ -1,5 +1,7 @@
 import { ConflictException } from "../exceptions/conflictException.js";
 import { InvalidBodyParamsException } from "../exceptions/invalidBodyParamsException.js";
+import { NotFoundException } from "../exceptions/notFoundException.js";
+import { UnauthorizedException } from "../exceptions/unauthorizedException.js";
 
 export const errorHandler = (err, req, res, next) => {
 	let statusCode;
@@ -11,6 +13,12 @@ export const errorHandler = (err, req, res, next) => {
 		message = err.message;
 		errors = err.errors;
 	} else if (err instanceof ConflictException) {
+		statusCode = err.statusCode;
+		message = err.message;
+	} else if (err instanceof NotFoundException) {
+		statusCode = err.statusCode;
+		message = err.message;
+	} else if (err instanceof UnauthorizedException) {
 		statusCode = err.statusCode;
 		message = err.message;
 	} else {

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser } from "../controllers/userController.js";
+import { createUser, loginUser } from "../controllers/userController.js";
 import { validateRequiredParams } from "../middlewares/validateMiddleware.js";
 import { validateUserInput } from "../middlewares/userMiddleware.js";
 
@@ -11,5 +11,6 @@ router.post(
 	validateUserInput,
 	createUser
 );
+router.post('/login', validateRequiredParams(["email", "password"]), loginUser);
 
 export default router;
