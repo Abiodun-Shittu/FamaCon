@@ -1,10 +1,12 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import JWT from "jsonwebtoken";
 import { ConflictException } from "../exceptions/conflictException.js";
 dotenv.config();
 
 const salt = Number(process.env.HASH_SALT);
+const secret_key = process.env.SECRET;
 
 // Create a new User
 export const createUser = async (req, res, next) => {
@@ -23,11 +25,19 @@ export const createUser = async (req, res, next) => {
 			profile_picture,
 			user_type,
 		});
+		const token = JWT.sign(
+			{ id: newUser._id, name: newUser.name, email: newUser.email },
+			secret_key
+		);
 		return res
 			.status(201)
-			.json({ message: "User created successfully", data: newUser });
+			.json({
+				message: "User created successfully",
+				data: newUser,
+				token,
+			});
 	} catch (error) {
-		console.log(error);
+		console.log(`Error creating user: ${error.message}`);
 		next(error);
 	}
 };
