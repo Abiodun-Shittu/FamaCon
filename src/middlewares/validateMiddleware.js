@@ -1,4 +1,4 @@
-export const validateUserParams = (requiredParams = []) => {
+export const validateRequiredParams = (requiredParams = []) => {
 	return (req, res, next) => {
 		let message = "";
 		let errors = {};

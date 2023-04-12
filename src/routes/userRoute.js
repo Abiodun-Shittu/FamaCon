@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { createUser } from "../controllers/userController.js";
-import { validateUserParams } from "../middlewares/userValidation.js";
+import { validateRequiredParams } from "../middlewares/validateMiddleware.js";
 
 const router = Router();
 
 router.post(
 	"/register",
-	validateUserParams(["name", "email", "password", "user_type"]),
+	validateRequiredParams(["name", "email", "password", "user_type"]),
 	createUser
 );
 
