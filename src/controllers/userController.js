@@ -68,3 +68,22 @@ export const loginUser = async (req, res, next) => {
 		next(error);
 	}
 };
+
+// Fetch the user
+export const getUser = async (req, res, next) => {
+	try {
+		const { userId } = req.params;
+
+		const findUser = await User.findById(userId);
+		if (!findUser) {
+			throw new NotFoundException("User not found");
+		}
+
+		return res
+			.status(200)
+			.json({ message: "User retrieved successfully", data: findUser });
+	} catch (error) {
+		console.log(`Error fetching user: ${error.message}`);
+		next(error);
+	}
+};
