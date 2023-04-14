@@ -6,6 +6,7 @@ import {
 } from "../controllers/userController.js";
 import { validateRequiredParams } from "../middlewares/validateMiddleware.js";
 import { validateUserInput } from "../middlewares/userMiddleware.js";
+import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
@@ -16,6 +17,6 @@ router.post(
 	createUser
 );
 router.post("/login", validateRequiredParams(["email", "password"]), loginUser);
-router.get("/:userId", getUser);
+router.get("/:userId", verifyToken, getUser);
 
 export default router;
