@@ -1,4 +1,5 @@
 import { ConflictException } from "../exceptions/conflictException.js";
+import { ForbiddenException } from "../exceptions/forbiddenException.js";
 import { InvalidBodyParamsException } from "../exceptions/invalidBodyParamsException.js";
 import { NotFoundException } from "../exceptions/notFoundException.js";
 import { UnauthorizedException } from "../exceptions/unauthorizedException.js";
@@ -20,6 +21,9 @@ export const errorHandler = (err, req, res, next) => {
 		message = err.message;
 	} else if (err instanceof UnauthorizedException) {
 		statusCode = err.statusCode;
+		message = err.message;
+	} else if (err instanceof ForbiddenException) {
+		statusCode = err.statuscode;
 		message = err.message;
 	} else {
 		statusCode = 500;
