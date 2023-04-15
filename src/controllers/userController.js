@@ -5,6 +5,7 @@ import JWT from "jsonwebtoken";
 import { ConflictException } from "../exceptions/conflictException.js";
 import { NotFoundException } from "../exceptions/notFoundException.js";
 import { UnauthorizedException } from "../exceptions/unauthorizedException.js";
+import { ForbiddenException } from "../exceptions/forbiddenException.js";
 dotenv.config();
 
 const salt = Number(process.env.HASH_SALT);
@@ -84,6 +85,41 @@ export const getUser = async (req, res, next) => {
 			.json({ message: "User retrieved successfully", data: findUser });
 	} catch (error) {
 		console.log(`Error fetching user: ${error.message}`);
+		next(error);
+	}
+};
+
+// Update the user
+export const updateUser = async (req, res, next) => {
+	try {
+		const { userId } = req.params;
+		const findUser = await User.findById(userId);
+		if (!findUser) {
+			throw new NotFoundException("User not found");
+		}
+		if (req.user.id !== findUser._id.toString()) {
+			throw new ForbiddenException(
+				"You are not allowed to access this page"
+			);
+		}
+		const { name, email, password, profile_picture } = req.body;
+		let hashPassword;
+		if (password) {
+			hashPassword = await bcrypt.hash(password, salt);
+		}
+
+		findUser.name = name || findUser.name;
+		findUser.email = email || findUser.email;
+		findUser.password = hashPassword || findUser.password;
+		findUser.profile_picture = profile_picture || findUser.profile;
+
+		await findUser.save();
+
+		return res
+			.status(200)
+			.json({ message: "User updated successfully", data: findUser });
+	} catch (error) {
+		console.log(`Error updating user: ${error.message}`);
 		next(error);
 	}
 };

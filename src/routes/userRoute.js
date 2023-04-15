@@ -3,6 +3,7 @@ import {
 	createUser,
 	getUser,
 	loginUser,
+	updateUser,
 } from "../controllers/userController.js";
 import { validateRequiredParams } from "../middlewares/validateMiddleware.js";
 import { validateUserInput } from "../middlewares/userMiddleware.js";
@@ -18,5 +19,6 @@ router.post(
 );
 router.post("/login", validateRequiredParams(["email", "password"]), loginUser);
 router.get("/:userId", verifyToken, getUser);
+router.put("/:userId", verifyToken, updateUser);
 
 export default router;
