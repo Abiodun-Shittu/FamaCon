@@ -123,3 +123,24 @@ export const updateUser = async (req, res, next) => {
 		next(error);
 	}
 };
+
+// Delete the user
+export const deleteUser = async (req, res, next) => {
+	try {
+		const { userId } = req.params;
+		const findUser = await User.findById(userId);
+		if (!findUser) {
+			throw new NotFoundException(`User not found`);
+		}
+		if (req.user.id !== findUser._id) {
+			throw new ForbiddenException(
+				"You are not allowed to access this page"
+			);
+		}
+		await findUser.deleteOne(userId);
+		return res.status(200).json({ message: "User deleted successfully" });
+	} catch (error) {
+		console.log(`Error deleting user: ${error.message}`);
+		next(error);
+	}
+};
