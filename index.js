@@ -1,6 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
-import { connect } from "./src/Database/Db.js";
+import { connect } from "./src/database/db.js";
+import userRouter from "./src/routes/userRoute.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
+
 dotenv.config();
 
 const app = express();
@@ -10,6 +13,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connect();
+
+// mount routes
+app.use('/api/users', userRouter)
+
+app.use(errorHandler);
 
 app.listen(port, () => {
 	console.log(`Server listening on http://localhost:${port}`);
