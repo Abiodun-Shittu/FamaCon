@@ -14,10 +14,13 @@ const secret_key = process.env.SECRET;
 // Create a new User
 export const createUser = async (req, res, next) => {
 	try {
-		const { name, email, password, profile_picture, user_type } = req.body;
+		const { name, email, password, confirmPassword, profile_picture, user_type } = req.body;
 		const checkEmailExists = await User.findOne({ email });
 		if (checkEmailExists) {
 			throw new ConflictException("Email already exists");
+		}
+		if (password !==  confirmPassword) {
+			throw new ForbiddenException("Password does not match")
 		}
 		// hash the password
 		const passwordHash = await bcrypt.hash(password, salt);
@@ -102,15 +105,10 @@ export const updateUser = async (req, res, next) => {
 				"You are not allowed to access this page"
 			);
 		}
-		const { name, email, password, profile_picture } = req.body;
-		let hashPassword;
-		if (password) {
-			hashPassword = await bcrypt.hash(password, salt);
-		}
+		const { name, email, profile_picture } = req.body;
 
 		findUser.name = name || findUser.name;
 		findUser.email = email || findUser.email;
-		findUser.password = hashPassword || findUser.password;
 		findUser.profile_picture = profile_picture || findUser.profile;
 
 		await findUser.save();
@@ -122,6 +120,35 @@ export const updateUser = async (req, res, next) => {
 		console.log(`Error updating user: ${error.message}`);
 		next(error);
 	}
+};
+
+// Change user password
+export const changePassword = async (req, res, next) => {
+	const { oldPassword, newPassword, confirmPassword } = req.body;
+	const { userId } = req.params;
+	const findUser = await User.findById(userId);
+	if (!findUser) {
+		throw new NotFoundException("User not found");
+	}
+	if (req.user.id !== findUser._id.toString()) {
+		throw new ForbiddenException("You are not allowed to access this page");
+	}
+	const comparePassword = await bcrypt.compare(oldPassword, findUser.password);
+
+	if(!comparePassword) {
+		throw new ForbiddenException("Invalid Old Password")
+	}
+	if (newPassword === oldPassword) {
+		throw new ForbiddenException("New password cannot be the same as old password")
+	}
+	if (newPassword !== confirmPassword) {
+		throw new ForbiddenException("Password do not match the new password")
+	}
+
+	findUser.password = await bcrypt.hashPassword(newPassword);
+	findUser.save();
+
+	return res.status(200).json({ message: "Password Change Successfully"})
 };
 
 // Delete the user
