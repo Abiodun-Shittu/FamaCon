@@ -124,7 +124,7 @@ export const updateUser = async (req, res, next) => {
 };
 
 // Change user password
-export const changePassword = async (req, res, next) => {
+export const changePassword = tryCatch(async (req, res, next) => {
 	const { oldPassword, newPassword, confirmPassword } = req.body;
 	const { userId } = req.params;
 	const findUser = await User.findById(userId);
@@ -150,7 +150,7 @@ export const changePassword = async (req, res, next) => {
 	findUser.save();
 
 	return res.status(200).json({ message: "Password Change Successfully"})
-};
+});
 
 // Delete the user
 export const deleteUser = tryCatch(async (req, res, next) => {
