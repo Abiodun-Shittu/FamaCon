@@ -6,6 +6,7 @@ import { ConflictException } from "../exceptions/conflictException.js";
 import { NotFoundException } from "../exceptions/notFoundException.js";
 import { UnauthorizedException } from "../exceptions/unauthorizedException.js";
 import { ForbiddenException } from "../exceptions/forbiddenException.js";
+import tryCatch from "../utils/helpers/tryCatch.helper.js";
 dotenv.config();
 
 const salt = Number(process.env.HASH_SALT);
@@ -152,8 +153,7 @@ export const changePassword = async (req, res, next) => {
 };
 
 // Delete the user
-export const deleteUser = async (req, res, next) => {
-	try {
+export const deleteUser = tryCatch(async (req, res, next) => {
 		const { userId } = req.params;
 		const findUser = await User.findById(userId);
 		if (!findUser) {
@@ -166,8 +166,5 @@ export const deleteUser = async (req, res, next) => {
 		}
 		await findUser.deleteOne(userId);
 		return res.status(200).json({ message: "User deleted successfully" });
-	} catch (error) {
-		console.log(`Error deleting user: ${error.message}`);
-		next(error);
-	}
-};
+
+});
