@@ -93,6 +93,26 @@ export const getUser = async (req, res, next) => {
 	}
 };
 
+//  Get Vendor information
+export const getVendorProfile = async (req, res, next) => {
+	try {
+		const vendorId = req.user.id
+
+		const vendor = await User.findById(vendorId)
+		if (!vendor) {
+			throw new NotFoundException("Vendor not found")
+		}
+
+		if (vendor.user_type !== "vendor") {
+			throw new UnauthorizedException("Access denied for this user")
+		}
+
+		return res.status(200).json({ message: "Vendor profile retrieved successfully", vendor})
+	} catch (error) {
+		
+	}
+}
+
 // Update the user
 export const updateUser = async (req, res, next) => {
 	try {
